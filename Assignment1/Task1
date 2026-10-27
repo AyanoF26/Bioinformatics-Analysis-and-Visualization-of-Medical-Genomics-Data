@@ -1,0 +1,13 @@
+Paper: Developmental landscape of human forebrain at a single-cell level identifies early waves of oligodendrogenesis. David van Bruggen, et al. PMID: 35523173
+
+Question1: What is the medically relevant insight from the article?
+
+Question2: Which genomics technology/technologies were used?
+- Single-cell RNA-seq
+- Single-cell ATAC-seq
+- Hybridization-based In Situ Sequencing (HybISS)
+- RNAscope HiPlex v2 assay
+
+Question3: List and explain at least three questions/hypotheses you can think of that extend the analysis presented in the paper.
+
+Question4: [Optional] Devise a computational analysis strategy for (some of) the listed question under Question3.
