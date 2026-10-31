@@ -1,0 +1,599 @@
+
+---
+title: "KI2026: Assignment 1 – R Programming and Data Visualisation"
+author: "Ayano Fushida"
+date: "2026-10-31"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5
+)
+```
+
+# Task 3: Introduction to R and Online R Course
+
+Install Bioconductor and tidyverse.
+
+```{r install-packages, eval=FALSE}
+# Install Bioconductor
+if (!require("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+BiocManager::install(version = "3.22")
+
+# Install tidyverse
+install.packages("tidyverse")
+```
+
+# Task 4: Basic R Operations
+
+### 4.1 What is the square root of 10?
+
+```{r}
+sqrt(10)
+```
+
+### 4.2 What is the logarithm of 32 to the base 2?
+
+```{r}
+log2(32)
+```
+
+### 4.3 What is the sum of the numbers from 1 to 100?
+
+```{r}
+sum(1:100)
+```
+
+### 4.4 What is the sum of all even numbers from 2 to 1000?
+
+`seq(2, 1000, by = 2)` generates 2, 4, 6, ..., 1000.
+
+```{r}
+sum(seq(2, 1000, by = 2))
+```
+
+### 4.5 How many pairwise comparisons are there for 100 genes?
+
+`choose()` calculates the number of possible combinations.
+
+```{r}
+choose(100, 2)
+```
+
+### 4.6 How many ways are there to arrange 100 genes in groups of three?
+
+```{r}
+choose(100, 3)
+```
+
+# Task 5: Using R Example Datasets
+
+### 5.1 Use the R internal CO2 dataset
+
+```{r}
+data(CO2)
+head(CO2)
+```
+
+### 5.2 Describe briefly the content of the CO2 dataset
+
+The CO2 data frame has 84 rows and 5 columns from an experiment on the cold tolerance of the grass species *Echinochloa crus-galli*.
+
+- **Plant:** Plant ID.
+- **Type:** Origin of the plant (Quebec or Mississippi).
+- **Treatment:** Whether the plants were chilled or nonchilled.
+- **conc:** Ambient carbon dioxide concentration (mL/L).
+- **uptake:** Carbon dioxide uptake rate (µmol/m² sec).
+
+### 5.3 What is the average and median CO2 uptake of plants from Quebec and Mississippi?
+
+```{r}
+# Check plant origins
+levels(CO2$Type)
+
+# Calculate mean CO2 uptake by plant origin
+tapply(CO2$uptake, CO2$Type, mean)
+
+# Calculate median CO2 uptake by plant origin
+tapply(CO2$uptake, CO2$Type, median)
+```
+
+### 5.4 In the airway example data, how many genes are expressed in each sample? How many genes are not expressed in any sample?
+
+The airway package can be installed using:
+
+```{r install-airway, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+BiocManager::install("airway")
+```
+
+Load the dataset:
+
+```{r}
+library(airway)
+data(airway)
+
+counts <- assay(airway)
+
+head(counts)
+```
+
+**Number of expressed genes in each sample**
+
+A gene is considered expressed when its raw count is greater than zero.
+
+```{r}
+# Count expressed genes per sample
+genes_per_sample <- apply(counts, 2, function(x) {
+  sum(x > 0)
+})
+
+genes_per_sample
+```
+
+`MARGIN = 2` applies the function to each column (sample).
+
+**Number of genes not expressed in any sample**
+
+```{r}
+# Count genes not expressed in any sample
+genes_not_expressed <- sum(
+  apply(counts, 1, function(x) {
+    all(x == 0)
+  })
+)
+
+genes_not_expressed
+```
+
+`MARGIN = 1` applies the function to each row (gene). `all()` checks whether the expression count is zero in every sample.
+
+# Task 6: R Functions
+
+### 6.1 Write a function that calculates the ratio of the mean and median of a given vector
+
+```{r}
+# Define a vector
+X <- c(3, 13, 11, 20, 26)
+
+# Create a function
+mean_median_ratio <- function(x) {
+  mean(x) / median(x)
+}
+
+# Calculate the ratio
+mean_median_ratio(X)
+```
+
+### 6.2 Write a function that ignores the lowest and highest values from a given vector and calculates the mean
+
+```{r}
+trimmed_mean <- function(x) {
+  x <- x[-c(which.min(x), which.max(x))]
+  mean(x)
+}
+
+trimmed_mean(X)
+```
+
+### 6.3 Read about piping. Write a short explanation of why, how and when not to use pipes
+
+**Additional explanation**
+Pipes connect multiple operations, making data processing more readable and sequential. They are useful for chaining data manipulation steps but should be avoided when operations become complex or require multiple inputs and outputs.
+
+**Assignment answer (max. 300 characters, excluding spaces)**
+Pipes can be used with operators such as `%>%`, `%T%`, `%$%` and `%<>%`. Avoid pipes for 10+ steps, multiple inputs or outputs, or complex dependencies. Use named intermediate objects to simplify debugging and clarify intent.
+
+### 6.4 Familiarise yourself with the apply-family of functions. Write a short explanation of why they could be useful in your work
+
+**Additional explanation**
+Apply-family functions automate calculations across genes, samples and conditions, reducing repetitive code and efficiently processing RNA-seq and ATAC-seq data.
+
+**Assignment answer (max. 300 characters, excluding spaces)**
+They streamline RNA-seq and ATAC-seq analyses by automating gene expression and peak comparisons across cell-cycle phases, treatments and replicates, enabling efficient calculations and summarisation with less repetitive code.
+
+# Task 7: Data Visualisation and Missing Values
+
+### 7.1 Compare the distributions of body heights between Jedi and Sith
+
+```{r}
+magic_guys <- read.csv("Week1-Task7data/magic_guys.csv")
+
+head(magic_guys)
+```
+
+#### A. Histograms using base R
+
+```{r}
+# Jedi histogram
+hist(
+  magic_guys$length[magic_guys$species == "jedi"],
+  breaks = 10,
+  col = "lightblue",
+  xlim = c(0, 300),
+  ylim = c(0, 15),
+  main = "Distribution of Body Heights of Jedi",
+  xlab = "Body Height",
+  ylab = "Frequency"
+)
+
+# Sith histogram
+hist(
+  magic_guys$length[magic_guys$species == "sith"],
+  breaks = 10,
+  col = "salmon",
+  xlim = c(0, 300),
+  ylim = c(0, 15),
+  main = "Distribution of Body Heights of Sith",
+  xlab = "Body Height",
+  ylab = "Frequency"
+)
+```
+
+#### B. Histogram using ggplot2
+
+```{r}
+library(ggplot2)
+
+h <- ggplot(magic_guys, aes(x = length, fill = species)) +
+  geom_histogram(
+    bins = 15,
+    color = "white"
+  ) +
+  scale_fill_manual(values = c(
+    "jedi" = "#56B4E9",
+    "sith" = "#E76F51"
+  )) +
+  facet_grid(. ~ species) +
+  labs(
+    x = "Body Height",
+    y = "Frequency",
+    title = "Body Height Distributions by Species",
+    subtitle = "Comparison of Jedi and Sith body heights"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10, color = "black"),
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "none",
+    panel.spacing = unit(2, "lines")
+  )
+
+h
+```
+
+#### C. Boxplot using ggplot2
+
+```{r}
+b <- ggplot(magic_guys, aes(x = species, y = length, fill = species)) +
+  geom_boxplot(
+    color = "black",
+    width = 0.4
+  ) +
+  scale_fill_manual(values = c(
+    "jedi" = "#56B4E9",
+    "sith" = "#E76F51"
+  )) +
+  labs(
+    x = "Species",
+    y = "Body Height",
+    title = "Body Height Distributions by Species",
+    subtitle = "Comparison of Jedi and Sith body heights"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 18, face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10, color = "black"),
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "none"
+  )
+
+b
+```
+
+#### D. Save the plots in PNG, PDF and SVG formats
+
+```{r}
+dir.create(
+  "Figures",
+  showWarnings = FALSE,
+  recursive = TRUE
+)
+
+# Save histogram
+ggsave("Figures/histogram.png", plot = h, dpi = 300)
+ggsave("Figures/histogram.pdf", plot = h)
+ggsave("Figures/histogram.svg", plot = h)
+
+# Save boxplot
+ggsave("Figures/boxplot.png", plot = b, dpi = 300)
+ggsave("Figures/boxplot.pdf", plot = b)
+ggsave("Figures/boxplot.svg", plot = b)
+```
+
+- **PNG:** When inserting a figure into PowerPoint or Word for presentations.
+- **PDF:** When submitting figures for a research paper or thesis.
+- **SVG:** When further editing and customising a figure is required.
+
+### 7.2 Load the gene expression data matrix from microarray_data.tab
+
+```{r}
+microarray <- read.delim(
+  "Week1-Task7data/microarray_data.tab",
+  header = TRUE,
+  sep = "\t"
+)
+
+head(microarray)
+```
+
+#### A. How big is the matrix in terms of rows and columns?
+
+```{r}
+nrow(microarray)
+ncol(microarray)
+```
+
+#### B. Count the missing values per gene and visualise this result
+
+```{r}
+# Count missing values per gene
+missing_per_gene <- colSums(is.na(microarray))
+
+head(missing_per_gene)
+```
+
+```{r}
+# Convert into a data frame for ggplot
+missing_df <- data.frame(
+  missing_count = missing_per_gene
+)
+
+# Visualise distribution of missing values
+ggplot(missing_df, aes(x = missing_count)) +
+  geom_histogram(
+    bins = 50,
+    fill = "#56B4E9",
+    color = "white"
+  ) +
+  labs(
+    title = "Distribution of Missing Values per Gene",
+    x = "Number of Missing Values",
+    y = "Number of Genes"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      size = 16,
+      face = "bold",
+      hjust = 0.5
+    ),
+    axis.title = element_text(size = 12)
+  )
+```
+
+#### C. Find the genes with more than 10%, 20% and 50% missing values
+
+`sapply()` applies the same calculation to each column and simplifies the result into a named vector.
+
+```{r}
+missing_percentage <- sapply(microarray, function(x) {
+  mean(is.na(x)) * 100
+})
+
+# More than 10%
+genes_10 <- names(missing_percentage[missing_percentage > 10])
+
+# More than 20%
+genes_20 <- names(missing_percentage[missing_percentage > 20])
+
+# More than 50%
+genes_50 <- names(missing_percentage[missing_percentage > 50])
+
+length(genes_10)
+length(genes_20)
+length(genes_50)
+```
+
+#### D. Replace missing values with the average expression value for each gene
+
+`lapply()` applies a function to every column. `na.rm = TRUE` excludes missing values when calculating the mean.
+
+```{r}
+microarray_imputed <- as.data.frame(
+  lapply(microarray, function(x) {
+    x[is.na(x)] <- mean(x, na.rm = TRUE)
+    x
+  })
+)
+
+# Check whether any missing values remain
+sum(is.na(microarray_imputed))
+```
+
+Mean imputation should be used with caution because it can affect the distribution and variability of gene expression values.
+
+### 7.3 Visualise the CO2 dataset in a way that gives a deeper understanding of the data. What do you see?
+
+```{r}
+data(CO2)
+
+ggplot(CO2, aes(
+  x = conc,
+  y = uptake,
+  group = Plant,
+  colour = Plant
+)) +
+  geom_point(size = 2) +
+  geom_line(linewidth = 0.7) +
+  facet_grid(Type ~ Treatment) +
+  labs(
+    title = "CO2 Uptake in Grass Plants",
+    x = "Ambient CO2 Concentration (mL/L)",
+    y = expression(CO[2]~Uptake~(mu*mol/m^2~sec))
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(
+      size = 16,
+      face = "bold",
+      hjust = 0.5
+    )
+  )
+```
+
+CO2 uptake increased as ambient CO2 concentration increased, eventually reaching a plateau. Chilling reduced CO2 uptake in both plant origins, with a much greater reduction in Mississippi plants than in Quebec plants, suggesting that the response to chilling may vary depending on plant origin.
+
+# Task 8: Tidybiology
+
+Install the tidybiology package:
+
+```{r install-tidybiology, eval=FALSE}
+install.packages("devtools")
+
+devtools::install_github("hirscheylab/tidybiology")
+```
+
+Load the package and datasets:
+
+```{r}
+library(tidybiology)
+library(dplyr)
+
+data("chromosome")
+data("proteins")
+```
+
+## 8.1 Chromosome dataset
+
+### A. Extract summary statistics (mean, median and maximum) for variations, protein-coding genes and miRNAs
+
+```{r}
+chromosome |>
+  summarise(
+    across(
+      c(variations, protein_codinggenes, mi_rna),
+      list(
+        mean = ~mean(.x, na.rm = TRUE),
+        median = ~median(.x, na.rm = TRUE),
+        maximum = ~max(.x, na.rm = TRUE)
+      )
+    )
+  )
+```
+
+### B. How does chromosome size distribute?
+
+```{r}
+# Check column type
+class(chromosome$basepairs)
+
+# Convert basepairs to integer
+chromosome$basepairs <- as.integer(chromosome$basepairs)
+
+ggplot(chromosome, aes(x = id, y = basepairs)) +
+  geom_col() +
+  labs(
+    x = "Chromosome ID",
+    y = "Size (bp)",
+    title = "Chromosome Size Distribution"
+  ) +
+  theme_minimal()
+```
+
+### C. Does the number of protein-coding genes or miRNAs correlate with chromosome length?
+
+#### Chromosome length and protein-coding genes
+
+```{r}
+ggplot(chromosome, aes(
+  x = length_mm,
+  y = protein_codinggenes
+)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Length of the chromosome (mm)",
+    y = "Number of protein-coding genes",
+    title = "Chromosome Length vs. Protein-Coding Genes"
+  ) +
+  theme_minimal()
+```
+
+#### Chromosome length and miRNAs
+
+```{r}
+ggplot(chromosome, aes(
+  x = length_mm,
+  y = mi_rna
+)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Length of the chromosome (mm)",
+    y = "Number of miRNAs",
+    title = "Chromosome Length vs. miRNAs"
+  ) +
+  theme_minimal()
+```
+
+#### Pearson correlation tests
+
+```{r}
+# Correlation between chromosome length and protein-coding genes
+cor.test(
+  chromosome$length_mm,
+  chromosome$protein_codinggenes,
+  method = "pearson"
+)
+
+# Correlation between chromosome length and miRNAs
+cor.test(
+  chromosome$length_mm,
+  chromosome$mi_rna,
+  method = "pearson"
+)
+```
+
+## 8.2 Protein dataset
+
+### A. Calculate the same summary statistics for protein length and mass
+
+```{r}
+summary(proteins[, c("length", "mass")])
+```
+
+### B. Visualise the relationship between protein length and mass
+
+```{r}
+ggplot(proteins, aes(x = length, y = mass)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(
+    x = "Length of the protein",
+    y = "Mass of the protein",
+    title = "Protein Length vs. Protein Mass"
+  ) +
+  theme_minimal()
+```
