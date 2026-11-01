@@ -1,13 +1,30 @@
-Paper: Developmental landscape of human forebrain at a single-cell level identifies early waves of oligodendrogenesis. David van Bruggen, et al. PMID: 35523173
+Task1 - Literature
+Article: van Bruggen, D. et al. (2022). Developmental landscape of human forebrain at a single-cell level identifies early waves of oligodendrogenesis. Developmental Cell, 57, 1421–1436. https://doi.org/10.1016/j.devcel.2022.04.016
 
-Question1: What is the medically relevant insight from the article?
 
-Question2: Which genomics technology/technologies were used?
-- Single-cell RNA-seq
-- Single-cell ATAC-seq
-- Hybridization-based In Situ Sequencing (HybISS)
-- RNAscope HiPlex v2 assay
+2a. What is the medically relevant insight from the article?
+The medically relevant insight from this study is that the first wave of oligodendrocyte development in the human forebrain begins much earlier than previously recognised, as early as post-conception week 8. The authors identify early oligodendrocyte precursor cells (OPCs) and their development from radial glia through an intermediate pre-OPC stage. They also highlight potential molecular regulators, including GSX1/2, ASCL1, OLIG2 and NOTCH signalling, that may control this process.
+Understanding these early developmental mechanisms could help guide the generation of OPCs from stem cells, with potential future applications in myelin repair and regenerative therapies for demyelinating diseases. However, the study focuses on normal human brain development rather than directly investigating disease mechanisms or treatments.
 
-Question3: List and explain at least three questions/hypotheses you can think of that extend the analysis presented in the paper.
 
-Question4: [Optional] Devise a computational analysis strategy for (some of) the listed question under Question3.
+2b. Which genomics technology/technologies were used?
+  - Single-cell RNA sequencing (scRNA-seq): Used to identify cell populations and gene expression profiles in the human  fetal forebrain at PCW 8–10. It allowed the authors to identify radial glia, glioblasts, pre-OPCs and OPCs, and investigate their potential developmental relationships.
+  - Single-nucleus/single-cell ATAC-seq (snATAC-seq): Used to examine chromatin accessibility during early OPC development. This provided information about regulatory regions and transcription factor motif accessibility, helping to identify potential changes in gene regulation during the pre-OPC to OPC transition.
+  - Hybridization-based in situ sequencing (HybISS): Used to examine the spatial distribution of selected gene expression patterns in fetal forebrain tissue. A panel of 50 genes was used to map different cell populations and identify regions where oligodendrogenesis first occurs.
+  - RNAscope HiPlex in situ hybridisation: Used to validate the presence and location of OPCs by detecting multiple marker genes in tissue sections.
+The authors also applied computational approaches, including RNA velocity, lineage inference and SCENIC regulatory network analysis, to predict developmental trajectories and potential transcriptional regulators.
+
+
+3a. List and explain at least three questions/ hypotheses you can think of that extend the analysis presented in the paper.
+
+  1. Which TFs are functionally required for the transition from pre-OPCs to OPCs?
+The study predicts several candidate regulators, including GSX1/2, ASCL1, OLIG2 and NOTCH signalling, but their functional roles remain unclear as these regulatory relationships are mainly based on computational inference. Perturbation experiments could determine whether these factors are necessary for the transition from pre-OPCs to OPCs.
+  2. What is the relative contribution of radial glia and HOPX-negative outer radial glia to early OPC generation?
+The authors suggest both populations as potential soursed of early PCS formation but their individual contributions remain unknown. Lineage tracing in human forebrain organoid models could help determine whether they generate OPCs through distinct developmental pathways.
+  3. Do OPCs generated during early and later developmental stages have different molecular characteristics or differentiation capacities?
+Comparing single-cell transcriptomic profiles from different developmental stages could reveal whether early and later OPC populations retain distinct identities or converge toward similar mature oligodendrocyte states.
+
+
+3b. Devise a computational analysis strategy for (some of) the listed questions under 3a.
+Ijtegrate publicly available fetal human brain scRNA-seq and snATAC-seq datasets from different developmental stages to investigate the progression of OPC development over time. Differential gene expression and chromatin accessibility analyses could identify changes in candidate regulatory factors, while trajectory and gene regulatory network analyses could determine whether the proposed early OPC developmental pathways are conserved at later stages.
+
