@@ -2,12 +2,11 @@
 ---
 title: "KI2026: Assignment 1 – R Programming and Data Visualisation"
 author: "Ayano Fushida"
-date: "2026-10-31"
+date: "2026-11-01"
 output:
   html_document:
-    toc: true
-    toc_depth: 3
-    number_sections: true
+    toc: false
+    number_sections: false
 ---
 
 ```{r setup, include=FALSE}
